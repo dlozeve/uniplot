@@ -1,0 +1,14 @@
+* Uniplot
+
+Unicode plotting library for [[https://cons.io/][Gerbil Scheme]].
+
+Depends on [[https://github.com/dlozeve/fancy][Fancy]] for colors and display.
+
+** Features
+
+- Braille canvas for plotting
+- Line plots
+
+** References
+
+- [[https://github.com/Evizero/UnicodePlots.jl][UnicodePlots.jl]] in [[https://julialang.org/][Julia]]
