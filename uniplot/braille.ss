@@ -53,8 +53,7 @@
 	     (char-color (indexf (lambda (x) (or (char=? (car x) #\newline)
 					    (char>? (car x) #\⠀)))
 				 characters colors)))
-	(if char-color
-	  (str (graphics-style [(cadr char-color)])
-	       (car char-color)
-	       (graphics-style))
-	  #\⠀)))))
+	(match char-color
+	  (#f " ")
+	  ([#\newline col] "\n")
+	  ([c col] (str (graphics-style [col]) c (graphics-style))))))))
