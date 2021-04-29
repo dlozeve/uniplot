@@ -4,8 +4,8 @@
 	:std/iter
 	:std/misc/list
 	:std/misc/string
-	:dlozeve/uniplot/braille
-	:dlozeve/fancy/format)
+	:dlozeve/fancy/format
+	:dlozeve/uniplot/braille)
 
 (def +default-colors+ '(green blue red yellow cyan magenta white))
 
@@ -22,8 +22,8 @@
   canvas)
 
 (def (line-plot lsts (colors +default-colors+)
-		width: (width 160) height: (height 80) borders: (borders #t)
-		xlabel: (xlabel #f))
+		width: (width 160) height: (height 80)
+		xlabel: (xlabel "") names: (names []))
   (define-values (xmin xmax ymin ymax canvases)
     (match lsts
       ([ys] (let ((xmin 0)
@@ -57,14 +57,25 @@
 					   width: width height: height)))))))
   (def canvases-str (canvases->string canvases colors))
   (def hor-size (u8vector-length (vector-ref (car canvases) 0)))
-  (def plot (if borders
-	      (str
-	       (format "      ┌─~a─┐\n~5,1F ┤ " (make-string hor-size #\─) ymax)
-	       (string-subst canvases-str "\n" " │\n      │ ")
-	       (format " │\n~5,1F ┤~a │\n" ymin (make-string (+ 1 hor-size) #\ ))
-	       (format "      └─┬~a┬─┘\n" (make-string (- hor-size 2) #\─))
-	       (format "\n     ~5,1F~a~5,1F\n" xmin (make-string (- hor-size 6) #\ ) xmax))
-	      canvases-str))
-  (if xlabel
-    (str plot (make-string (quotient hor-size 2) #\ ) xlabel "\n")
-    plot))
+  (def vert-size (vector-length (car canvases)))
+  (def plot (str
+	     (format "      ┌─~a─┐\n~5,1F ┤ " (make-string hor-size #\─) ymax)
+	     (string-subst canvases-str "\n" " │\n      │ ")
+	     (format " │\n~5,1F ┤~a │\n" ymin (make-string (+ 1 hor-size) #\ ))
+	     (format "      └─┬~a┬─┘\n" (make-string (- hor-size 2) #\─))
+	     (format "\n     ~5,1F~a~5,1F\n" xmin (make-string (- hor-size 6) #\ ) xmax)))
+  (def plot-with-legend (if (null? names)
+			  plot
+			  (str plot
+			       (cursor-up (+ 4 vert-size))
+			       (cursor-forward (+ 12 hor-size))
+			       (apply str
+				 (for/collect ((name names) (color colors))
+				   (str (graphics-style [color]) name (graphics-style)
+					(cursor-down 1)
+					(cursor-back (string-length name)))))
+			       (cursor-down (- (+ 4 vert-size) (length names)))
+			       (cursor-back (+ 12 hor-size)))))
+  (if (string-empty? xlabel)
+    plot-with-legend
+    (str plot-with-legend (make-string (quotient hor-size 2) #\ ) xlabel "\n")))
