@@ -44,7 +44,7 @@
 (def (indexf pred . lsts)
   (find pred (apply map list lsts)))
 
-(def (canvases->string canvases (colors '(red green cyan yellow magenta white)))
+(def (canvases->string canvases colors)
   (def canvases-str (map canvas->string canvases))
   (def size (string-length (car canvases-str)))
   (apply str
