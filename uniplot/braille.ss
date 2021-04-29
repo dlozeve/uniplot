@@ -39,7 +39,7 @@
 	       (def row (vector-ref canvas (1- i)))
 	       (for/collect ((j (in-range (u8vector-length row))))
 		 (integer->char (+ (char->integer #\⠀) (u8vector-ref row j))))))
-  (list->string (flatten (map (lambda (l) (append1 l #\newline)) chars))))
+  (string-join (map list->string chars) #\newline))
 
 (def (indexf pred . lsts)
   (find pred (apply map list lsts)))
