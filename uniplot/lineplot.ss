@@ -1,4 +1,4 @@
-(export #t)
+(export line-plot)
 
 (import :std/format
 	:std/iter
@@ -25,33 +25,41 @@
   canvas)
 
 (def (add-border! plot xmin xmax ymin ymax)
+  (def ymin-label (format "~5,1F" ymin))
+  (def ymax-label (format "~5,1F" ymax))
+  (def label-width (max (string-length ymin-label) (string-length ymax-label)))
+  (def padding (make-string label-width #\ ))
   (set! (plot-str plot)
     (str
-     (format "      ┌─~a─┐\n~5,1F ┤ " (make-string (plot-hsize plot) #\─) ymax)
-     (string-subst (plot-str plot) "\n" " │\n      │ ")
-     (format " │\n~5,1F ┤~a │\n" ymin (make-string (+ 1 (plot-hsize plot)) #\ ))
-     (format "      └─┬~a┬─┘\n" (make-string (- (plot-hsize plot) 2) #\─))
-     (format "\n     ~5,1F~a~5,1F\n" xmin (make-string (- (plot-hsize plot) 6) #\ ) xmax))))
+     padding " ┌─" (make-string (plot-hsize plot) #\─) "─┐\n"
+     (make-string (- label-width (string-length ymax-label)) #\ ) ymax-label " ┤ "
+     (string-subst (plot-str plot) "\n" (format " │\n~a │ " padding))
+     " │\n"
+     (make-string (- label-width (string-length ymax-label)) #\ ) ymax-label " ┤ "
+     (make-string (+ 1 (plot-hsize plot)) #\ ) "│\n"
+     (make-string label-width #\ ) " └─┬" (make-string (- (plot-hsize plot) 2) #\─) "┬─┘\n"
+     "\n" padding (format "~5,1F~a~5,1F\n" xmin (make-string (- (plot-hsize plot) 6) #\ ) xmax)))
+  (set! (plot-hsize plot) (+ (plot-hsize plot) label-width 5)))
 
 (def (add-legend! plot names colors)
   (set! (plot-str plot)
     (str (plot-str plot)
 	 (cursor-up (+ 4 (plot-vsize plot)))
-	 (cursor-forward (+ 12 (plot-hsize plot)))
+	 (cursor-forward (+ 1 (plot-hsize plot)))
 	 (apply str
 	   (for/collect ((name names) (color colors))
 	     (str (graphics-style [color]) name (graphics-style)
 		  (cursor-down 1)
 		  (cursor-back (string-length name)))))
 	 (cursor-down (- (+ 4 (plot-vsize plot)) (length names)))
-	 (cursor-back (+ 12 (plot-hsize plot))))))
+	 (cursor-back (+ 1 (plot-hsize plot))))))
 
 (def (add-xlabel! plot xlabel)
   (set! (plot-str plot)
     (str (plot-str plot) (make-string (quotient (plot-hsize plot) 2) #\ ) xlabel "\n")))
 
 (def (line-plot lsts (colors +default-colors+)
-		width: (width 160) height: (height 80)
+		width: (width 160) height: (height 100)
 		xlabel: (xlabel "") names: (names []))
   (define-values (xmin xmax ymin ymax canvases)
     (match lsts
