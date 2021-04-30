@@ -7,6 +7,9 @@
 	:dlozeve/fancy/format
 	:dlozeve/uniplot/braille)
 
+(defstruct plot
+  (str hsize vsize))
+
 (def +default-colors+ '(green blue red yellow cyan magenta white))
 
 (def (scale-fn lo hi)
@@ -20,6 +23,32 @@
 			 (inexact->exact (floor (* width (x-scale-fn x))))
 			 #t))
   canvas)
+
+(def (add-border! plot xmin xmax ymin ymax)
+  (set! (plot-str plot)
+    (str
+     (format "      ┌─~a─┐\n~5,1F ┤ " (make-string (plot-hsize plot) #\─) ymax)
+     (string-subst (plot-str plot) "\n" " │\n      │ ")
+     (format " │\n~5,1F ┤~a │\n" ymin (make-string (+ 1 (plot-hsize plot)) #\ ))
+     (format "      └─┬~a┬─┘\n" (make-string (- (plot-hsize plot) 2) #\─))
+     (format "\n     ~5,1F~a~5,1F\n" xmin (make-string (- (plot-hsize plot) 6) #\ ) xmax))))
+
+(def (add-legend! plot names colors)
+  (set! (plot-str plot)
+    (str (plot-str plot)
+	 (cursor-up (+ 4 (plot-vsize plot)))
+	 (cursor-forward (+ 12 (plot-hsize plot)))
+	 (apply str
+	   (for/collect ((name names) (color colors))
+	     (str (graphics-style [color]) name (graphics-style)
+		  (cursor-down 1)
+		  (cursor-back (string-length name)))))
+	 (cursor-down (- (+ 4 (plot-vsize plot)) (length names)))
+	 (cursor-back (+ 12 (plot-hsize plot))))))
+
+(def (add-xlabel! plot xlabel)
+  (set! (plot-str plot)
+    (str (plot-str plot) (make-string (quotient (plot-hsize plot) 2) #\ ) xlabel "\n")))
 
 (def (line-plot lsts (colors +default-colors+)
 		width: (width 160) height: (height 80)
@@ -55,27 +84,10 @@
 			    (for/collect ((ys yss))
 			      (draw-canvas xs ys x-scale-fn y-scale-fn
 					   width: width height: height)))))))
-  (def canvases-str (canvases->string canvases colors))
-  (def hor-size (u8vector-length (vector-ref (car canvases) 0)))
-  (def vert-size (vector-length (car canvases)))
-  (def plot (str
-	     (format "      ┌─~a─┐\n~5,1F ┤ " (make-string hor-size #\─) ymax)
-	     (string-subst canvases-str "\n" " │\n      │ ")
-	     (format " │\n~5,1F ┤~a │\n" ymin (make-string (+ 1 hor-size) #\ ))
-	     (format "      └─┬~a┬─┘\n" (make-string (- hor-size 2) #\─))
-	     (format "\n     ~5,1F~a~5,1F\n" xmin (make-string (- hor-size 6) #\ ) xmax)))
-  (def plot-with-legend (if (null? names)
-			  plot
-			  (str plot
-			       (cursor-up (+ 4 vert-size))
-			       (cursor-forward (+ 12 hor-size))
-			       (apply str
-				 (for/collect ((name names) (color colors))
-				   (str (graphics-style [color]) name (graphics-style)
-					(cursor-down 1)
-					(cursor-back (string-length name)))))
-			       (cursor-down (- (+ 4 vert-size) (length names)))
-			       (cursor-back (+ 12 hor-size)))))
-  (if (string-empty? xlabel)
-    plot-with-legend
-    (str plot-with-legend (make-string (quotient hor-size 2) #\ ) xlabel "\n")))
+  (def plot (make-plot (canvases->string canvases colors)
+		       (u8vector-length (vector-ref (car canvases) 0))
+		       (vector-length (car canvases))))
+  (add-border! plot xmin xmax ymin ymax)
+  (unless (null? names) (add-legend! plot names colors))
+  (unless (string-empty? xlabel) (add-xlabel! plot xlabel))
+  (plot-str plot))
