@@ -64,9 +64,14 @@
   (set! (plot-str plot)
     (str (plot-str plot) (make-string (quotient (plot-hsize plot) 2) #\ ) xlabel "\n")))
 
+(def (add-title! plot title)
+  (set! (plot-str plot)
+    (str "\n" (make-string (quotient (- (plot-hsize plot) 10) 2) #\ ) title "\n\n"
+	 (plot-str plot))))
+
 (def (line-plot lsts (colors +default-colors+)
 		width: (width 160) height: (height 100)
-		xlabel: (xlabel "") names: (names []))
+		title: (title "") xlabel: (xlabel "") names: (names []))
   (define-values (xmin xmax ymin ymax canvases)
     (match lsts
       ([ys] (let ((xmin 0)
@@ -104,4 +109,5 @@
   (add-border! plot xmin xmax ymin ymax)
   (unless (null? names) (add-legend! plot names colors))
   (unless (string-empty? xlabel) (add-xlabel! plot xlabel))
+  (unless (string-empty? title) (add-title! plot title))
   (plot-str plot))

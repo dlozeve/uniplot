@@ -14,5 +14,5 @@
 	   (for/collect ((row csv))
 	     (for/collect ((x row))
 	       (or (string->number x) +nan.0)))))
-  (displayln (line-plot lsts
+  (displayln (line-plot lsts title: (if (null? args) "" (car args))
 			xlabel: (car names) names: (cdr names))))

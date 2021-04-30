@@ -7,12 +7,15 @@ Depends on [[https://github.com/dlozeve/fancy][Fancy]] for colors and display.
 #+ATTR_HTML: :width 100% :style margin-left: auto; margin-right: auto;
 [[./demo.png]]
 
-Annual CO₂ emissions (t) (source: [[https://ourworldindata.org/grapher/annual-co2-emissions-per-country?tab=chart&time=1850..latest&country=CHN~USA~Europe][Our World in Data]])
+(source: [[https://ourworldindata.org/grapher/annual-co2-emissions-per-country?tab=chart&time=1850..latest&country=CHN~USA~Europe][Our World in Data]])
 
 ** Features
 
 - Braille canvas for plotting
 - Line plots
+- Axes and tick labels showing ranges
+- Optional title, x-axis label, and legend
+- Input data loading from a CSV file
 
 ** References
 
