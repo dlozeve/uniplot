@@ -11,8 +11,7 @@
   (def names (car csv))
   (def lsts
     (apply map list
-	   (for/collect ((row csv))
+	   (for/collect ((row (cdr csv)))
 	     (for/collect ((x row))
 	       (or (string->number x) +nan.0)))))
-  (displayln (line-plot lsts title: (if (null? args) "" (car args))
-			xlabel: (car names) names: (cdr names))))
+  (displayln (line-plot lsts title: (if (null? args) "" (car args)) names: names)))

@@ -71,7 +71,7 @@
 
 (def (line-plot lsts (colors +default-colors+)
 		width: (width 160) height: (height 100)
-		title: (title "") xlabel: (xlabel "") names: (names []))
+		title: (title "") names: (names []))
   (define-values (xmin xmax ymin ymax canvases)
     (match lsts
       ([ys] (let ((xmin 0)
@@ -83,15 +83,6 @@
 				    (scale-fn xmin xmax)
 				    (scale-fn ymin ymax)
 				    width: width height: height)])))
-      ([xs ys] (let ((xmin (apply nanmin xs))
-		     (xmax (apply nanmax xs))
-		     (ymin (apply nanmin ys))
-		     (ymax (apply nanmax ys)))
-		 (values xmin xmax ymin ymax
-			 [(draw-canvas xs ys
-				       (scale-fn xmin xmax)
-				       (scale-fn ymin ymax)
-				       width: width height: height)])))
       ([xs . yss] (let* ((xmin (apply nanmin xs))
 			 (xmax (apply nanmax xs))
 			 (all-ys (flatten yss))
@@ -107,7 +98,11 @@
 		       (u8vector-length (vector-ref (car canvases) 0))
 		       (vector-length (car canvases))))
   (add-border! plot xmin xmax ymin ymax)
-  (unless (null? names) (add-legend! plot names colors))
-  (unless (string-empty? xlabel) (add-xlabel! plot xlabel))
+  (if (null? (cdr names))
+    (add-legend! plot (list (car names)) colors)
+    (add-legend! plot (cdr names) colors))
+  (if (null? (cdr names))
+    (add-xlabel! plot "Index")
+    (add-xlabel! plot (car names)))
   (unless (string-empty? title) (add-title! plot title))
   (plot-str plot))
