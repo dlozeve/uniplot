@@ -4,5 +4,6 @@
 
 (defbuild-script
   '("uniplot/braille"
-    "uniplot/lineplot")
+    "uniplot/lineplot"
+    (static-exe: "uniplot"))
   optimize: #t)
