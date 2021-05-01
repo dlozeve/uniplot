@@ -1,11 +1,10 @@
 * Uniplot
 
-Unicode plotting library for [[https://cons.io/][Gerbil Scheme]].
-
-Depends on [[https://github.com/dlozeve/fancy][Fancy]] for colors and display.
+Unicode plotting tool for displaying CSV data directly in your
+terminal.
 
 #+ATTR_HTML: :width 100% :style margin-left: auto; margin-right: auto;
-[[./demo.png]]
+[[./images/demo.png]]
 
 (source: [[https://ourworldindata.org/grapher/annual-co2-emissions-per-country?tab=chart&time=1850..latest&country=CHN~USA~Europe][Our World in Data]])
 
@@ -16,6 +15,56 @@ Depends on [[https://github.com/dlozeve/fancy][Fancy]] for colors and display.
 - Axes and tick labels showing ranges
 - Optional title, x-axis label, and legend
 - Input data loading from a CSV file
+
+** Usage
+
+Start from a well-formatted CSV file:
+
+#+begin_src sh
+$ head data/annual_co2_emissions.csv
+Year,United States,China,France,Germany,Italy,United Kingdom
+1750,,,,,,9.350528e6
+1751,,,,,,9.350528e6
+1752,,,,,,9.354192e6
+1753,,,,,,9.354192e6
+1754,,,,,,9.357856e6
+1755,,,,,,9.36152e6
+1756,,,,,,1.0006384e7
+1757,,,,,,1.0010048e7
+1758,,,,,,1.0013712e7
+#+end_src
+
+Uniplot reads the standard input for a CSV file, and its behaviour
+depends on the number of columns:
+- If there is only one column, it will plot its values against a
+  simple range index.
+- For two or more columns, it will use the first column for the
+  x-axis, and plot the next columns with different colors against it.
+
+You can use a tool like Awk or [[https://github.com/BurntSushi/xsv][xsv]] to select the columns you want to
+plot:
+#+begin_src sh
+awk -F, -v OFS=, '{print $1, $4, $5, $6, $7}' data/annual_co2_emissions.csv | uniplot
+#+end_src
+
+And you can add a title by giving an argument to ~uniplot~:
+#+begin_src sh
+awk -F, -v OFS=, '{print $1, $4, $5, $6, $7}' data/annual_co2_emissions.csv | uniplot "Annual CO₂ emissions (kg)"
+#+end_src
+
+** Build
+
+Install [[https://cons.io/][Gerbil Scheme]].
+
+Uniplot depends on [[https://github.com/dlozeve/fancy][Fancy]] for colors and display.
+
+#+begin_src sh
+gxpkg install github.com/dlozeve/fancy
+gxpkg install github.com/dlozeve/uniplot
+#+end_src
+
+Or manually clone [[https://github.com/dlozeve/fancy][Fancy]] and [[https://github.com/dlozeve/uniplot][Uniplot]] and run ~./build.ss~ in the root
+directory of each repository.
 
 ** References
 
