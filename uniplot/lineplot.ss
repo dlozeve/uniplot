@@ -76,18 +76,18 @@
     (match lsts
       ([ys] (let ((xmin 0)
 		  (xmax (length ys))
-		  (ymin (apply nanmin ys))
-		  (ymax (apply nanmax ys)))
+		  (ymin (for/fold (ymin +nan.0) (y ys) (nanmin ymin y)))
+		  (ymax (for/fold (ymax +nan.0) (y ys) (nanmax ymax y))))
 	      (values xmin xmax ymin ymax
 		      [(draw-canvas (iota (length ys)) ys
 				    (scale-fn xmin xmax)
 				    (scale-fn ymin ymax)
 				    width: width height: height)])))
-      ([xs . yss] (let* ((xmin (apply nanmin xs))
-			 (xmax (apply nanmax xs))
+      ([xs . yss] (let* ((xmin (for/fold (xmin +nan.0) (x xs) (nanmin xmin x)))
+			 (xmax (for/fold (xmax +nan.0) (x xs) (nanmax xmax x)))
 			 (all-ys (flatten yss))
-			 (ymin (apply nanmin all-ys))
-			 (ymax (apply nanmax all-ys))
+			 (ymin (for/fold (ymin +nan.0) (y all-ys) (nanmin ymin y)))
+			 (ymax (for/fold (ymax +nan.0) (y all-ys) (nanmax ymax y)))
 			 (x-scale-fn (scale-fn xmin xmax))
 			 (y-scale-fn (scale-fn ymin ymax)))
 		    (values xmin xmax ymin ymax

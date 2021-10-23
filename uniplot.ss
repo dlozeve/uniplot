@@ -3,15 +3,18 @@
 (export main)
 
 (import :std/iter
+	:std/misc/func
 	:std/text/csv
 	:dlozeve/uniplot/lineplot)
+
+(def (parse-number s)
+  (or (string->number s) +nan.0))
 
 (def (main . args)
   (def csv (read-csv-lines (current-input-port)))
   (def names (car csv))
   (def lsts
-    (apply map list
-	   (for/collect ((row (cdr csv)))
-	     (for/collect ((x row))
-	       (or (string->number x) +nan.0)))))
+    (for/fold (lsts (repeat '() (length names)))
+	((row (cdr csv)))
+      (map cons (map parse-number row) lsts)))
   (displayln (line-plot lsts title: (if (null? args) "" (car args)) names: names)))
