@@ -12,11 +12,11 @@
 
 (def +default-colors+ '(green blue red yellow cyan magenta white))
 
-(def (nanmin . rest)
-  (apply min (filter finite? rest)))
+(def (nanmin lst)
+  (for/fold (xmin +inf.0) (x lst when (finite? x)) (min xmin x)))
 
-(def (nanmax . rest)
-  (apply max (filter finite? rest)))
+(def (nanmax lst)
+  (for/fold (xmax -inf.0) (x lst when (finite? x)) (max xmax x)))
 
 (def (scale-fn lo hi)
   (lambda (x) (/ (- x lo) (- hi lo))))
@@ -76,18 +76,18 @@
     (match lsts
       ([ys] (let ((xmin 0)
 		  (xmax (length ys))
-		  (ymin (for/fold (ymin +nan.0) (y ys) (nanmin ymin y)))
-		  (ymax (for/fold (ymax +nan.0) (y ys) (nanmax ymax y))))
+		  (ymin (nanmin ys))
+		  (ymax (nanmax ys)))
 	      (values xmin xmax ymin ymax
 		      [(draw-canvas (iota (length ys)) ys
 				    (scale-fn xmin xmax)
 				    (scale-fn ymin ymax)
 				    width: width height: height)])))
-      ([xs . yss] (let* ((xmin (for/fold (xmin +nan.0) (x xs) (nanmin xmin x)))
-			 (xmax (for/fold (xmax +nan.0) (x xs) (nanmax xmax x)))
+      ([xs . yss] (let* ((xmin (nanmin xs))
+			 (xmax (nanmax xs))
 			 (all-ys (flatten yss))
-			 (ymin (for/fold (ymin +nan.0) (y all-ys) (nanmin ymin y)))
-			 (ymax (for/fold (ymax +nan.0) (y all-ys) (nanmax ymax y)))
+			 (ymin (nanmin all-ys))
+			 (ymax (nanmax all-ys))
 			 (x-scale-fn (scale-fn xmin xmax))
 			 (y-scale-fn (scale-fn ymin ymax)))
 		    (values xmin xmax ymin ymax
