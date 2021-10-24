@@ -1,9 +1,32 @@
 #!/usr/bin/env gxi
 
-(import :std/build-script)
+(import :std/make)
 
-(defbuild-script
+(def lib-build-spec
   '("uniplot/braille"
-    "uniplot/lineplot"
-    (static-exe: "uniplot"))
-  optimize: #t)
+    "uniplot/lineplot"))
+
+(def bin-build-spec
+  '((static-exe: "uniplot")))
+
+(def srcdir
+  (path-normalize (path-directory (this-source-file))))
+
+(def (main . args)
+  (match args
+    (["lib"]
+     (make srcdir: srcdir
+           optimize: #t
+           debug: 'src
+           static: #t
+           lib-build-spec))
+    (["bin"]
+     (make srcdir: srcdir
+	   optimize: #t
+	   debug: #f
+	   static: #t
+	   build-deps: "build-deps-bin"
+	   bin-build-spec))
+    ([]
+     (main "lib")
+     (main "bin"))))
