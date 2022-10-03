@@ -7,7 +7,7 @@
     "uniplot/lineplot"))
 
 (def bin-build-spec
-  '((static-exe: "uniplot")))
+  '((exe: "uniplot")))
 
 (def srcdir
   (path-normalize (path-directory (this-source-file))))
