@@ -41,7 +41,7 @@
      (make-string (- label-width (string-length ymax-label)) #\ ) ymax-label " ┤ "
      (string-subst (plot-str plot) "\n" (format " │\n~a │ " padding))
      " │\n"
-     (make-string (- label-width (string-length ymax-label)) #\ ) ymax-label " ┤ "
+     (make-string (- label-width (string-length ymin-label)) #\ ) ymin-label " ┤ "
      (make-string (+ 1 (plot-hsize plot)) #\ ) "│\n"
      (make-string label-width #\ ) " └─┬" (make-string (- (plot-hsize plot) 2) #\─) "┬─┘\n"
      "\n" padding (format "~5,1F~a~5,1F\n" xmin (make-string (- (plot-hsize plot) 6) #\ ) xmax)))
