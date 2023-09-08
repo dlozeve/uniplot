@@ -7,7 +7,7 @@
     "uniplot/lineplot"))
 
 (def bin-build-spec
-  '((exe: "uniplot")))
+  '((optimized-exe: "uniplot")))
 
 (def srcdir
   (path-normalize (path-directory (this-source-file))))
@@ -16,15 +16,11 @@
   (match args
     (["lib"]
      (make srcdir: srcdir
-           optimize: #t
-           debug: 'src
-           static: #t
+           debug: 'env
            lib-build-spec))
     (["bin"]
      (make srcdir: srcdir
-	   optimize: #t
 	   debug: #f
-	   static: #t
 	   build-deps: "build-deps-bin"
 	   bin-build-spec))
     ([]
