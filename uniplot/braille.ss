@@ -3,8 +3,6 @@
 (import :std/iter
 	:std/misc/list
 	:std/misc/string
-	:gerbil/gambit/hvectors
-	:gerbil/gambit/bits
 	:dlozeve/fancy/format)
 
 (def +braille-signs+
@@ -23,7 +21,7 @@
   (def c (u8vector-ref (vector-ref canvas (quotient i 4)) (quotient j 2)))
   (def offset (u8vector-ref +braille-signs+
 			    (+ (remainder i 4) (* 4 (remainder j 2)))))
-  (any-bits-set? c offset))
+  (not (zero? (bitwise-and c offset))))
 
 (def (braille-canvas-set! canvas i j v)
   (def old-offset (u8vector-ref (vector-ref canvas (quotient i 4)) (quotient j 2)))
